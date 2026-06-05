@@ -1,0 +1,44 @@
+name: Deploy to EC2 Kubernetes
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Copy project to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "."
+          target: "/home/ubuntu/app"
+
+      - name: Deploy application
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/app
+
+            docker build -t hello-k8s .
+
+            minikube image load hello-k8s
+
+            kubectl delete deployment hello-k8s-deployment --ignore-not-found
+            kubectl delete service hello-k8s-service --ignore-not-found
+
+            kubectl apply -f deployment.yaml
+            kubectl apply -f service.yaml
+
+            kubectl rollout status deployment/hello-k8s-deployment
