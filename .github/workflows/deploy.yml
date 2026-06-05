@@ -33,6 +33,7 @@ jobs:
 
             docker build -t hello-k8s .
 
+            minikube image rm hello-k8s || true
             minikube image load hello-k8s
 
             kubectl apply -f k8s.yaml
