@@ -16,12 +16,12 @@ jobs:
       - name: Copy project to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "."
-          target: "/home/ubuntu/app"
-          overwrite: true
+            host: ${{ secrets.EC2_HOST }}
+            username: ${{ secrets.EC2_USER }}
+            key: ${{ secrets.EC2_SSH_KEY }}
+            source: "Dockerfile,index.html,k8s.yaml"
+            target: "/home/ubuntu/app"
+            overwrite: true
 
       - name: Deploy application
         uses: appleboy/ssh-action@v1.0.3
