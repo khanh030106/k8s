@@ -21,6 +21,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           source: "."
           target: "/home/ubuntu/app"
+          overwrite: true
 
       - name: Deploy application
         uses: appleboy/ssh-action@v1.0.3
@@ -31,13 +32,14 @@ jobs:
           script: |
             cd /home/ubuntu/app
 
-            docker build -t hello-k8s .
+            IMAGE_TAG="${{ github.sha }}"
 
-            minikube image rm hello-k8s || true
-            minikube image load hello-k8s
+            docker build -t hello-k8s:$IMAGE_TAG .
+
+            minikube image load hello-k8s:$IMAGE_TAG
+
+            sed -i "s|image: hello-k8s:.*|image: hello-k8s:$IMAGE_TAG|g" k8s.yaml
 
             kubectl apply -f k8s.yaml
 
-            kubectl rollout restart deployment/hello-k8s-deployment
-            kubectl delete pod -l app=hello-k8s
             kubectl rollout status deployment/hello-k8s-deployment
