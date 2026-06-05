@@ -35,10 +35,7 @@ jobs:
 
             minikube image load hello-k8s
 
-            kubectl delete deployment hello-k8s-deployment --ignore-not-found
-            kubectl delete service hello-k8s-service --ignore-not-found
+            kubectl apply -f k8s.yaml
 
-            kubectl apply -f deployment.yaml
-            kubectl apply -f service.yaml
-
+            kubectl rollout restart deployment/hello-k8s-deployment
             kubectl rollout status deployment/hello-k8s-deployment
