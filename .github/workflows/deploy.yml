@@ -38,4 +38,5 @@ jobs:
             kubectl apply -f k8s.yaml
 
             kubectl rollout restart deployment/hello-k8s-deployment
+            kubectl delete pod -l app=hello-k8s
             kubectl rollout status deployment/hello-k8s-deployment
