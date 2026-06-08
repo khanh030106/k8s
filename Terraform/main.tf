@@ -6,6 +6,12 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+
+    null = {
+      source  = "hashicorp/null"
+      version = "~> 3.2"
+    }
+
   }
 }
 
@@ -35,6 +41,14 @@ resource "aws_security_group" "k8s_sg" {
     description = "HTTP"
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    description = "HTTPS"
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -139,5 +153,17 @@ resource "aws_lb_listener" "http_listener" {
   default_action {
     type             = "forward"
     target_group_arn = aws_lb_target_group.app_tg.arn
+  }
+}
+
+resource "null_resource" "deployment_info" {
+  depends_on = [
+    aws_instance.k8s_server,
+    aws_lb.app_alb,
+    aws_lb_listener.http_listener
+  ]
+
+  provisioner "local-exec" {
+    command = "echo Infrastructure is ready. GitHub Actions can deploy the app to Minikube on EC2."
   }
 }
