@@ -9,5 +9,5 @@ output "alb_dns_name" {
 
 output "alb_url" {
   description = "HTTP URL of the Application Load Balancer"
-  value       = "http://${aws_lb.app_alb.dns_name}"
+  value       ="http://${aws_lb.app_alb.dns_name}"
 }
